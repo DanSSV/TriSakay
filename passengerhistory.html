@@ -12,7 +12,7 @@
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
 
-    <title>TriSakay | Dashboard</title>
+    <title>Driver | History</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" type="image/png" href="image/Logo_Nobg.png" />
 </head>
@@ -20,7 +20,7 @@
 <body>
     <nav class="navbar navbar-expand-lg" style="background-color: #073e5d;">
         <div class="container-fluid">
-            <a href="index.html" class="navbar-brand">
+            <a href="driver.html" class="navbar-brand">
                 <img src="image/1-removebg-preview.png" alt="Logo" width="120" height="50">
             </a>
             <button class="navbar-toggler " type="button" data-bs-toggle="collapse"
@@ -31,10 +31,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active text-white" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active text-white" aria-current="page" href="driver.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="history1.html">History</a>
+                        <a class="nav-link text-white" href="passengerhistory.html">History</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
@@ -55,25 +55,60 @@
         </div>
     </nav>
 
-    <img src="image/Logo_Nobg.png" alt="Baliuag Logo" class="logo" />
-
-    <button class="mylocation">My Location</button>
-    <button class="scan">Scan Code</button>
-    <button class="fare">Min Fare ₱30.00</button>
-    <script>
-
-        let myLocationButton = document.querySelector('.mylocation');
-        let scanButton = document.querySelector('.scan');
-
-        myLocationButton.addEventListener('click', function () {
-            window.location.href = 'CurrentLoc.html';
-        });
-
-        scanButton.addEventListener('click', function () {
-            window.location.href = 'scan.html';
-        });
-
-    </script>
+    <h1>Passenger History</h1>
+    <div class="form-group">
+  <label for="date-input" class="white-label">Select a date:</label>
+<input type="date" class="form-control" id="date-input" name="date">
+</div>
+<h5>Today's Earnings: ₱440</h5>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Destination</th>
+      <th scope="col">KM</th>
+      <th scope="col">Fare</th>
+      <th scope="col">Date & Time</th>
+    </tr>
+  </thead>
+  <tbody>
+        <tr>
+      <td>John Doe</td>
+      <td>SM City Baliwag</td>
+      <td>2</td>
+      <td>₱30</td>
+      <td>May 2, 2023 10:00 AM</td>
+    </tr>
+    <tr>
+      <td>Jane Smith</td>
+      <td>Malolos Cathedral</td>
+      <td>15</td>
+      <td>₱160</td>
+      <td>May 3, 2023 3:00 PM</td>
+    </tr>
+    <tr>
+      <td>Robert Garcia</td>
+      <td>Puente del Diablo</td>
+      <td>5</td>
+      <td>₱60</td>
+      <td>May 5, 2023 8:30 AM</td>
+    </tr>
+    <tr>
+      <td>Mary Torres</td>
+      <td>Barasoain Church</td>
+      <td>7</td>
+      <td>₱80</td>
+      <td>May 7, 2023 1:00 PM</td>
+    </tr>
+    <tr>
+      <td>Mark Lee</td>
+      <td>Amana Waterpark</td>
+      <td>10</td>
+      <td>₱110</td>
+      <td>May 8, 2023 11:00 AM</td>
+    </tr>
+  </tbody>
+</table>
 </body>
 
 </html>

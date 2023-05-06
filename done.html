@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sample</title>
+  <link rel="stylesheet" href="css/search.css" />
+  <link rel="icon" type="image/png" href="image/Logo_Nobg.png" />
+
+  <script src="https://kit.fontawesome.com/f8daa09b38.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg" style="background-color: #073e5d;">
+    <div class="container-fluid">
+      <a href="index.html" class="navbar-brand">
+        <img src="image/1-removebg-preview.png" alt="Logo" width="120" height="50">
+      </a>
+      <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars" style="color: #0bda73;"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active text-white" aria-current="page" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="history1.html">History</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Account
+            </a>
+            <ul class="dropdown-menu dropdown-menu-start">
+
+              <li><a class="dropdown-item" href="#">Manage Account</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="Login.html">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="search">
+    <input id="search-input" type="text" placeholder="Search for a location">
+    <button id="search-button">Search</button>
+  </div>
+
+  <div class="loc">
+    <div id="map"></div>
+  </div>
+
+  <div class="info">
+    <h1>Double click to select a destination</h1>
+  </div>
+
+  <div class="backbtn">
+    <button class="confirm">Confirm</button>
+    <button class="back">Back?</button>
+  </div>
+
+
+  <script>
+    var map = L.map("map").setView([14.954324668012775, 120.90080124844123], 17);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 21,
+    }).addTo(map);
+
+    var userLocation;
+
+    // adds marker to current location map.locate()
+    map.on("locationfound", function (e) {
+      userLocation = e.latlng;
+      var marker = L.marker(userLocation).addTo(map);
+      marker.bindPopup("You are here!").openPopup();
+    });
+
+    map.on("locationerror", function (e) {
+      alert(e.message);
+    });
+
+    map.locate({ setView: true, maxZoom: 20, enableHighAccuracy: true });
+    //  center to the current location
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+
+          map.setView(
+            [position.coords.latitude, position.coords.longitude],
+            13
+          );
+          // para sa location display nya based sa locate()
+          axios
+            .get(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLocation[0]}&lon=${userLocation[1]}`
+            )
+            .then(response => {
+              const address = response.data.display_name;
+              const h1 = document.querySelector("h1");
+              h1.textContent = address;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        },
+        function () {
+          map.setView([14.954324668012775, 120.90080124844123], 13);
+        }
+      );
+    } else {
+      map.setView([14.954324668012775, 120.90080124844123], 13);
+    }
+
+    var newMarker;
+    var routePolyline;
+
+    // Calculate the distance between the new marker and the user's current location using the distanceTo()
+
+
+    map.on("dblclick", function (e) {
+      if (newMarker) {
+        map.removeLayer(newMarker);
+      }
+      if (routePolyline) {
+        map.removeLayer(routePolyline);
+      }
+      newMarker = L.marker(e.latlng).addTo(map);
+      var markerLocation = newMarker.getLatLng();
+      var distance = userLocation.distanceTo(markerLocation) / 1000;
+
+      var time = distance / 0.23233333;
+      var cost;
+      if (distance <= 2) {
+        cost = 30;
+      } else {
+        cost = 30 + (distance - 2) * 10;
+      }
+      cost = Math.round(cost); // round off the cost result
+
+      newMarker
+        .bindPopup("Distance: " + distance.toFixed(2) + " km" + "<br>Time: " + time.toFixed(0) + " min" + "<br>Fare: ₱" + cost.toFixed(2))
+        .openPopup();
+      updateHeader();
+
+
+
+      // get marker 1 and marker 2 loc and calculate distance and call OpenRouteService for route and time
+
+
+      var waypoints = [[userLocation.lng, userLocation.lat],
+      [markerLocation.lng, markerLocation.lat]
+      ];
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + waypoints.join(';') + '?geometries=geojson';
+      fetch(url)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          var geojson = data.routes[0].geometry;
+          routePolyline = L.geoJSON(geojson, {
+            style: { color: 'blue', weight: 6 }
+          }).addTo(map);
+        })
+        .catch(function (error) {
+          console.log(error);
+          location.reload();
+        });
+    });
+
+    const backButton = document.querySelector('.back');
+
+    backButton.addEventListener('click', function () {
+      window.location.href = 'index.html';
+    });
+
+
+    document.getElementById("search-button").addEventListener("click", function () {
+      // Get the value of the search input
+      var searchValue = document.getElementById("search-input").value;
+
+      // Use the Nominatim API to geocode the search value into a latitude and longitude
+      axios.get("https://nominatim.openstreetmap.org/search?q=" + searchValue + "&format=json&limit=1")
+        .then(function (response) {
+          var result = response.data[0];
+
+          // Center the map on the geocoded location
+          map.setView([result.lat, result.lon], 18);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+
+    function updateHeader() {
+      var markerLocation = newMarker.getLatLng();
+      var url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + markerLocation.lat + "&lon=" + markerLocation.lng;
+      fetch(url)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          var address = data.display_name;
+          var addressArray = address.split(",");
+          addressArray.splice(-6);
+          var header = document.querySelector("h1");
+          header.innerHTML = "Destination: " + addressArray.join(", ");
+        })
+        .catch(function (error) {
+          console.log(error);
+          var header = document.querySelector("h1");
+          header.innerHTML = "Destination: " + markerLocation.lat.toFixed(6) + ", " + markerLocation.lng.toFixed(6);
+        });
+    }
+
+    document.querySelector('.confirm').addEventListener('click', showConfirmDialog);
+
+    // function showConfirmDialog() {
+    //   if (window.confirm('Are you sure about your destination? You cannot change this action after clicking Confirm.')) {
+    //     // If user clicks "OK", do something (e.g. submit form)
+    //     console.log('Confirmed!');
+    //   } else {
+    //     // If user clicks "Cancel", do something else (e.g. go back)
+    //     console.log('Cancelled!');
+    //   }
+    // }
+    function showConfirmDialog() {
+      if (window.confirm('Are you sure about your destination? You cannot change this action after clicking Confirm.')) {
+        // If user clicks "OK", hide the search and back buttons and do something (e.g. submit form)
+        console.log('Confirmed!');
+        document.querySelector('.search').style.display = 'none';
+        document.querySelector('.backbtn').style.display = 'none';
+        document.getElementById('map').style.height = '600px';
+  document.querySelector('.loc').style.height = '600px';
+   var markerLocation = newMarker.getLatLng();
+
+    // Center the map view between the user's current location and the new marker
+    var bounds = L.latLngBounds(userLocation, markerLocation);
+    map.fitBounds(bounds);
+      } else {
+        // If user clicks "Cancel", do something else (e.g. go back)
+        console.log('Cancelled!');
+      }
+    }
+document.addEventListener('keydown', function(event) {
+  if (event.shiftKey && event.code === 'Digit0') {
+    window.location.href = 'receipt.html';
+  }
+});
+
+
+  </script>
+
+
+
+
+</body>
+
+</html>
