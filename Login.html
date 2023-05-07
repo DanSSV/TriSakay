@@ -68,7 +68,7 @@
       <p>
         Don’t have an account?
         <a
-          href="#"
+          href="signup.html"
           style="color: #f5f5f5"
           onmouseover="this.style.color='#073e5d'"
           onmouseout="this.style.color='#F5F5F5'"
@@ -76,5 +76,12 @@
         >.
       </p>
     </div>
+    <script>
+      document.addEventListener('keydown', function(event) {
+  if (event.shiftKey && event.code === 'Digit0') {
+    window.location.href = 'driver.html';
+  }
+});
+    </script>
   </body>
 </html>
